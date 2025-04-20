@@ -1,0 +1,31 @@
+name: C++ CI/CD
+
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, fedora-latest]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ libcppunit-dev
+
+    - name: Install dependencies (Fedora)
+      if: matrix.os == 'fedora-latest'
+      run: |
+        sudo dnf install -y gcc-c++ cppunit-devel
+
+    - name: Build and test
+      run: |
+        g++ main.cpp -o hello
+        g++ tests/test.cpp -o test -lcppunit
+        ./test
+        ./hello
